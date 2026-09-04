@@ -70,7 +70,7 @@
 
 ### Increment 1 — Project Skeleton and Runtime Baseline
 
-- **Status:** pending
+- **Status:** completed
 - **Depends on:** none
 - **Estimated size:** S
 
