@@ -2,12 +2,13 @@ import httpx
 from fastapi import FastAPI
 from collections.abc import AsyncGenerator
 
-from app.config import settings
+from backend.app.config import settings
+from backend.app.api.routers.health import router as health_router
 
 
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     app.state.http_client = httpx.AsyncClient(
-        base_url=settings.api_base_url,
+        base_url=settings.gemini_api_base_url,
         timeout=settings.http_timeout,
     )
     yield
@@ -18,4 +19,6 @@ app = FastAPI(
     version='1.0.0',
     lifespan=lifespan
 )
+
+app.include_router(health_router)
 
