@@ -118,7 +118,7 @@ Keep module imports lightweight to avoid side effects during tests.
 
 ### Increment 2 — Database Core and Alembic Baseline
 
-- **Status:** pending
+- **Status:** completed
 - **Depends on:** Increment 1
 - **Estimated size:** S
 
