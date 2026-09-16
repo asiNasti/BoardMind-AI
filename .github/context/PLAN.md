@@ -164,7 +164,7 @@ Use SQLAlchemy 2.x style and typed `Mapped[]` fields.
 
 ### Increment 3 — Gemini API Client Service
 
-- **Status:** pending
+- **Status:** completed
 - **Depends on:** Increment 1
 - **Estimated size:** S
 
