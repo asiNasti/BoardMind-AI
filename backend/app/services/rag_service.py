@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.db.models import ChatMessage, ChatSession, Document, DocumentChunk
 from backend.app.services.gemini_client import GeminiClient
 
-OFF_TOPIC_MESSAGE = "Це питання не стосується правил гри."
-UNKNOWN_RULE_MESSAGE = "В правилах про це не сказано"
+OFF_TOPIC_MESSAGE = "This question is unrelated to the game rules."
+UNKNOWN_RULE_MESSAGE = "The rules do not mention this"
 
 
 class RAGService:
@@ -50,10 +50,13 @@ class RAGService:
             prompt = self.build_prompt(content, [chunk.content for chunk, _ in retrieved], history)
             answer = await self.gemini_client.generate_response(prompt)
 
+        await self._save_messages(session_id, content, answer)
+        return answer
+
+    async def _save_messages(self, session_id: int, content: str, answer: str) -> None:
         self.session.add(ChatMessage(session_id=session_id, role="user", content=content))
         self.session.add(ChatMessage(session_id=session_id, role="assistant", content=answer))
         await self.session.commit()
-        return answer
 
     async def _recent_messages(self, session_id: int) -> list[ChatMessage]:
         statement = (

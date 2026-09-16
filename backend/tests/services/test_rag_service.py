@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from backend.app.services.gemini_client import GeminiClientError
 from backend.app.services.rag_service import OFF_TOPIC_MESSAGE, RAGService
 
 
@@ -30,6 +31,36 @@ async def test_query_returns_exact_off_topic_message_without_llm_call() -> None:
     assert result == OFF_TOPIC_MESSAGE
     client.generate_response.assert_not_awaited()
     db.commit.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_query_propagates_gemini_client_error() -> None:
+    db = MagicMock()
+    db.get = AsyncMock(return_value=SimpleNamespace(game_id=7))
+    db.commit = AsyncMock()
+    client = AsyncMock()
+    client.generate_embeddings.side_effect = GeminiClientError("Gemini API request failed")
+
+    service = RAGService(db, client)
+
+    with pytest.raises(GeminiClientError, match="request failed"):
+        await service.query(3, "How do turns work?")
+
+    db.commit.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_query_rejects_missing_chat_session() -> None:
+    db = MagicMock()
+    db.get = AsyncMock(return_value=None)
+    client = AsyncMock()
+
+    service = RAGService(db, client)
+
+    with pytest.raises(ValueError, match="Chat session was not found"):
+        await service.query(3, "How do turns work?")
+
+    client.generate_embeddings.assert_not_awaited()
 
 
 def test_build_prompt_contains_context_history_and_guardrail() -> None:
