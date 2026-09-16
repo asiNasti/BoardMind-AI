@@ -209,7 +209,7 @@ Do not use the official SDK if it relies on blocking sync requests; use raw HTTP
 
 ### Increment 4 — Game and Document Core (CRUD)
 
-- **Status:** pending
+- **Status:** completed
 - **Depends on:** Increment 2
 - **Estimated size:** M
 
