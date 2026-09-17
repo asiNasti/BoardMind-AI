@@ -32,7 +32,9 @@ async def test_db_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest_asyncio.fixture
-async def client(test_db_session: AsyncSession) -> AsyncGenerator[httpx.AsyncClient, None]:
+async def client(
+    test_db_session: AsyncSession,
+) -> AsyncGenerator[httpx.AsyncClient, None]:
     test_app = FastAPI()
     test_app.include_router(games_router)
 

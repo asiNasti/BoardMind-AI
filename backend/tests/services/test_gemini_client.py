@@ -4,7 +4,6 @@ import respx
 
 from backend.app.services.gemini_client import GeminiClient, GeminiClientError
 
-
 BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 API_KEY = "test-api-key"
 
@@ -33,7 +32,11 @@ async def test_generate_response_sends_prompt_and_returns_text() -> None:
         route = router.post("/models/gemini-1.5-flash:generateContent").mock(
             return_value=httpx.Response(
                 200,
-                json={"candidates": [{"content": {"parts": [{"text": "Draw two cards."}]}}]},
+                json={
+                    "candidates": [
+                        {"content": {"parts": [{"text": "Draw two cards."}]}}
+                    ]
+                },
             )
         )
 

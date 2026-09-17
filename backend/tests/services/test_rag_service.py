@@ -39,7 +39,9 @@ async def test_query_propagates_gemini_client_error() -> None:
     db.get = AsyncMock(return_value=SimpleNamespace(game_id=7))
     db.commit = AsyncMock()
     client = AsyncMock()
-    client.generate_embeddings.side_effect = GeminiClientError("Gemini API request failed")
+    client.generate_embeddings.side_effect = GeminiClientError(
+        "Gemini API request failed"
+    )
 
     service = RAGService(db, client)
 
@@ -66,7 +68,9 @@ async def test_query_rejects_missing_chat_session() -> None:
 def test_build_prompt_contains_context_history_and_guardrail() -> None:
     history = [SimpleNamespace(role="user", content="How do turns work?")]
 
-    prompt = RAGService.build_prompt("Can I pass?", ["A player may pass once."], history)
+    prompt = RAGService.build_prompt(
+        "Can I pass?", ["A player may pass once."], history
+    )
 
     assert "A player may pass once." in prompt
     assert "user: How do turns work?" in prompt

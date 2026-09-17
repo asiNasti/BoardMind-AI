@@ -1,5 +1,6 @@
 from collections.abc import Mapping
-from typing import Any
+from types import TracebackType
+from typing import Any, Self
 
 import httpx
 
@@ -28,10 +29,15 @@ class GeminiClient:
         )
         self._owns_http_client = http_client is None
 
-    async def __aenter__(self) -> "GeminiClient":
+    async def __aenter__(self) -> Self:
         return self
 
-    async def __aexit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
         await self.aclose()
 
     async def aclose(self) -> None:
@@ -53,12 +59,14 @@ class GeminiClient:
     async def generate_response(self, prompt: str) -> str:
         response = await self._post(
             "/models/gemini-1.5-flash:generateContent",
-            {"contents": [{"parts": [{"text": prompt }]}]},
+            {"contents": [{"parts": [{"text": prompt}]}]},
         )
         try:
             text = response["candidates"][0]["content"]["parts"][0]["text"]
         except (KeyError, IndexError, TypeError) as exc:
-            raise GeminiClientError("Gemini returned an invalid generation response") from exc
+            raise GeminiClientError(
+                "Gemini returned an invalid generation response"
+            ) from exc
         if not isinstance(text, str):
             raise GeminiClientError("Gemini returned an invalid generation response")
         return text

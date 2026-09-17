@@ -9,7 +9,9 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_api_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
     http_timeout: float = 10.0
-    database_url: str = "postgresql+asyncpg://boardmind:boardmind@localhost:5432/boardmind"
+    database_url: str = (
+        "postgresql+asyncpg://boardmind:boardmind@localhost:5432/boardmind"
+    )
 
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,

@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,7 +11,9 @@ class IngestionService:
         self.session = session
         self.gemini_client = gemini_client
 
-    async def ingest_document(self, game_id: int, filename: str, file_bytes: bytes) -> Document:
+    async def ingest_document(
+        self, game_id: int, filename: str, file_bytes: bytes
+    ) -> Document:
         game = await self.session.get(Game, game_id)
         if game is None:
             raise ValueError(f"Game {game_id} not found")
@@ -53,5 +53,7 @@ class IngestionService:
         )
         return list(result.scalars().all())
 
-    async def ingest_document_from_bytes(self, game_id: int, filename: str, file_bytes: bytes) -> Document:
+    async def ingest_document_from_bytes(
+        self, game_id: int, filename: str, file_bytes: bytes
+    ) -> Document:
         return await self.ingest_document(game_id, filename, file_bytes)

@@ -6,7 +6,6 @@ import pytest_asyncio
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
 database_user = os.getenv("POSTGRES_USER", "boardmind")
 database_password = os.getenv("POSTGRES_PASSWORD", "boardmind")
 database_name = os.getenv("POSTGRES_DB", "boardmind")

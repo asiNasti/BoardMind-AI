@@ -9,6 +9,8 @@ from fastapi import FastAPI
 from backend.app.api.routers.chat import (
     get_chat_service,
     get_rag_service,
+)
+from backend.app.api.routers.chat import (
     router as chat_router,
 )
 from backend.app.services.chat_service import ChatService
