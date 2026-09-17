@@ -33,7 +33,9 @@ class RAGService:
             raise ValueError("Chat session was not found")
 
         query_embedding = await self.gemini_client.generate_embeddings(content)
-        distance = DocumentChunk.embedding.cosine_distance(query_embedding).label("distance")
+        distance = DocumentChunk.embedding.cosine_distance(query_embedding).label(
+            "distance"
+        )
         statement = (
             select(DocumentChunk, distance)
             .join(Document, Document.id == DocumentChunk.document_id)
@@ -47,15 +49,21 @@ class RAGService:
             answer = OFF_TOPIC_MESSAGE
         else:
             history = await self._recent_messages(session_id)
-            prompt = self.build_prompt(content, [chunk.content for chunk, _ in retrieved], history)
+            prompt = self.build_prompt(
+                content, [chunk.content for chunk, _ in retrieved], history
+            )
             answer = await self.gemini_client.generate_response(prompt)
 
         await self._save_messages(session_id, content, answer)
         return answer
 
     async def _save_messages(self, session_id: int, content: str, answer: str) -> None:
-        self.session.add(ChatMessage(session_id=session_id, role="user", content=content))
-        self.session.add(ChatMessage(session_id=session_id, role="assistant", content=answer))
+        self.session.add(
+            ChatMessage(session_id=session_id, role="user", content=content)
+        )
+        self.session.add(
+            ChatMessage(session_id=session_id, role="assistant", content=answer)
+        )
         await self.session.commit()
 
     async def _recent_messages(self, session_id: int) -> list[ChatMessage]:
@@ -75,8 +83,12 @@ class RAGService:
         chunks: Sequence[str],
         history: Sequence[ChatMessage],
     ) -> str:
-        context = "\n\n".join(f"[Rule {index}] {chunk}" for index, chunk in enumerate(chunks, 1))
-        history_text = "\n".join(f"{message.role}: {message.content}" for message in history)
+        context = "\n\n".join(
+            f"[Rule {index}] {chunk}" for index, chunk in enumerate(chunks, 1)
+        )
+        history_text = "\n".join(
+            f"{message.role}: {message.content}" for message in history
+        )
         return (
             "You are a board game referee. Answer only from the provided context. "
             f"If the answer is not in the context, say: {UNKNOWN_RULE_MESSAGE}.\n\n"

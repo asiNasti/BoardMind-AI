@@ -32,11 +32,19 @@ This skill performs a rigorous code review of recently added or modified code. I
    - Verify that vector operations use `pgvector.sqlalchemy` operators correctly (e.g., cosine similarity).
    - Ensure external AI calls (Google Gemini) use asynchronous HTTP clients (`httpx.AsyncClient`).
    - Verify that domain exceptions and API rate limits are caught and converted to clean FastAPI `HTTPException` responses without leaking stack traces.
-6. **Test Coverage Check:**
+6. **Formatting & Type Safety Check:**
+   - Run the local quality tools to ensure no formatting or type issues were introduced:
+     ```bash
+     black --check backend/
+     ruff check backend/
+     cd backend && mypy app
+     ```
+   - Flag any formatting discrepancies or type errors as blocking issues.
+7. **Test Coverage Check:**
    - Verify that corresponding automated tests exist in `tests/` for the new code.
    - **CRITICAL:** Ensure that any tests interacting with the AI Service use `respx` (or similar tools) to mock external Google Gemini API calls. No live HTTP calls are allowed during tests.
    - Verify that running `pytest --cov=backend/app` shows no drop in test coverage and meets the minimum project threshold (80%).
-7. **Generate Report:** Produce a structured Markdown review report summarizing the findings.
+8. **Generate Report:** Produce a structured Markdown review report summarizing the findings.
 
 ## Output Format
 
@@ -63,3 +71,4 @@ This skill performs a rigorous code review of recently added or modified code. I
 - No Live AI in Tests: Instantly flag any test file that hits the real Gemini API. respx mocking is mandatory.
 - Strict Verdicts: If there is even one "Blocking Issue", the Verdict MUST be CHANGE REQUESTED. Only issue a PASS if all architectural, RAG, and testing constraints are met.
 - Actionable Feedback: Always explain why something is wrong and provide a brief snippet showing the correct FastAPI/SQLAlchemy/httpx pattern.
+- Code Style & Types Compliance: Code must pass `black --check`, `ruff check`, and `mypy app`. Any linter or type-checking error found via bash must be marked as a blocking issue.

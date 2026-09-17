@@ -63,12 +63,16 @@ async def test_ingest_document_generates_embeddings_and_persists_chunks(
     assert route.called
 
     stored = await test_db_session.execute(
-        select(DocumentChunk).where(DocumentChunk.document_id == document.id).order_by(DocumentChunk.chunk_index)
+        select(DocumentChunk)
+        .where(DocumentChunk.document_id == document.id)
+        .order_by(DocumentChunk.chunk_index)
     )
     chunks = stored.scalars().all()
     assert len(chunks) == 3
     assert all(len(chunk.embedding) == 768 for chunk in chunks)
     assert all(chunk.content for chunk in chunks)
 
-    count = await test_db_session.scalar(select(Document.id).where(Document.id == document.id))
+    count = await test_db_session.scalar(
+        select(Document.id).where(Document.id == document.id)
+    )
     assert count == document.id

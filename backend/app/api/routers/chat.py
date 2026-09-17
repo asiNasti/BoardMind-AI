@@ -25,13 +25,15 @@ class MessageResponse(BaseModel):
     content: str
 
 
-def get_chat_service(session: AsyncSession = Depends(get_db_session)) -> ChatService:
+def get_chat_service(
+    session: AsyncSession = Depends(get_db_session),  # noqa: B008
+) -> ChatService:
     return ChatService(session)
 
 
 async def get_rag_service(
     request: Request,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = Depends(get_db_session),  # noqa: B008
 ) -> AsyncGenerator[RAGService, None]:
     client = GeminiClient(http_client=request.app.state.http_client)
     yield RAGService(session, client)
@@ -40,21 +42,25 @@ async def get_rag_service(
 @router.post("/sessions/", response_model=ChatSessionResponse, status_code=201)
 async def create_chat_session(
     session_data: ChatSessionCreate,
-    service: ChatService = Depends(get_chat_service),
+    service: ChatService = Depends(get_chat_service),  # noqa: B008
 ) -> ChatSessionResponse:
     try:
-        return await service.create_session(session_data.game_id)
+        chat_session = await service.create_session(session_data.game_id)
+        return ChatSessionResponse.model_validate(chat_session)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
-@router.get("/sessions/{session_id}/messages/", response_model=list[ChatMessageResponse])
+@router.get(
+    "/sessions/{session_id}/messages/", response_model=list[ChatMessageResponse]
+)
 async def list_chat_messages(
     session_id: int,
-    service: ChatService = Depends(get_chat_service),
+    service: ChatService = Depends(get_chat_service),  # noqa: B008
 ) -> list[ChatMessageResponse]:
     try:
-        return await service.list_messages(session_id)
+        messages = await service.list_messages(session_id)
+        return [ChatMessageResponse.model_validate(message) for message in messages]
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
@@ -63,7 +69,7 @@ async def list_chat_messages(
 async def send_message(
     session_id: int,
     message: MessageRequest,
-    service: RAGService = Depends(get_rag_service),
+    service: RAGService = Depends(get_rag_service),  # noqa: B008
 ) -> MessageResponse:
     try:
         answer = await service.query(session_id, message.content)
