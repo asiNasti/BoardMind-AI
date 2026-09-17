@@ -2,6 +2,7 @@ fastapi>=0.115,<1.0
 httpx>=0.27,<1.0
 pydantic-settings>=2.6,<3.0
 uvicorn[standard]>=0.32,<1.0
+structlog>=24.4,<26.0
 
 # Database and migration dependencies for the upcoming increments.
 sqlalchemy>=2.0,<3.0

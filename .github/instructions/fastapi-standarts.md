@@ -34,6 +34,13 @@ These standards define the rules for writing clean, secure, and maintainable asy
 - Use `Mapped` and `mapped_column` in declarative base models.
 - When performing vector searches, ensure you use the appropriate mathematical operators provided by `pgvector.sqlalchemy` (e.g., `Model.embedding.cosine_distance(query_vector)`).
 
+## Topic: Observability & Logging
+
+- **Strictly use `structlog`:** Never use `print()` or the standard `logging` module in production code.
+- **Contextual Data:** Always bind relevant execution context to your logs as kwargs. For RAG flows, log variables like `game_id`, `session_id`, `cosine_distance`, `chunk_count`, and `latency_ms`.
+- **Event Naming:** Use clear, lowercase `snake_case` event names (e.g., `logger.info("vector_search_completed", match_count=3, top_distance=0.15)`).
+- **Error Tracing:** When catching domain or API errors in Services, use `logger.exception("operation_failed")` to capture the traceback before raising a clean FastAPI `HTTPException`.
+
 ## Anti-patterns
 
 - **Fat Routers:** Writing database queries, chunking logic, or prompt formatting directly inside the FastAPI `@router` function.

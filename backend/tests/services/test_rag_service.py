@@ -75,3 +75,27 @@ def test_build_prompt_contains_context_history_and_guardrail() -> None:
     assert "A player may pass once." in prompt
     assert "user: How do turns work?" in prompt
     assert "The rules do not mention this" in prompt
+
+
+@pytest.mark.asyncio
+async def test_query_logs_off_topic_event(caplog) -> None:
+    db = MagicMock()
+    db.get = AsyncMock(return_value=SimpleNamespace(game_id=7))
+    db.execute = AsyncMock()
+    db.commit = AsyncMock()
+    result = MagicMock()
+    retrieved_row = namedtuple("RetrievedRow", ["chunk", "distance"])
+    result.all.return_value = [
+        retrieved_row(SimpleNamespace(content="Turn order"), 0.9)
+    ]
+    db.execute.return_value = result
+    client = AsyncMock()
+    client.generate_embeddings.return_value = [0.1, 0.2]
+
+    service = RAGService(db, client, similarity_threshold=0.35)
+
+    with caplog.at_level("INFO"):
+        await service.query(3, "What is the price of a spaceship?")
+
+    assert "off_topic_query" in caplog.text
+    assert '"session_id": 3' in caplog.text
