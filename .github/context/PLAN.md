@@ -255,7 +255,7 @@ Ensure routers delegate DB operations to a service layer.
 
 ### Increment 5 — RAG Ingestion Flow (PDF Processing)
 
-- **Status:** pending
+- **Status:** completed
 - **Depends on:** Increment 3, Increment 4
 - **Estimated size:** L
 
