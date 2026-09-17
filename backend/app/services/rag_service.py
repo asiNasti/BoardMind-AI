@@ -3,11 +3,14 @@ from collections.abc import Sequence
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.core.logger import get_logger
 from backend.app.db.models import ChatMessage, ChatSession, Document, DocumentChunk
 from backend.app.services.gemini_client import GeminiClient
 
 OFF_TOPIC_MESSAGE = "This question is unrelated to the game rules."
 UNKNOWN_RULE_MESSAGE = "The rules do not mention this"
+
+logger = get_logger(__name__)
 
 
 class RAGService:
@@ -28,8 +31,12 @@ class RAGService:
         self.history_limit = history_limit
 
     async def query(self, session_id: int, content: str) -> str:
+        logger.info(
+            "rag_query_started", session_id=session_id, question_length=len(content)
+        )
         chat_session = await self.session.get(ChatSession, session_id)
         if chat_session is None:
+            logger.warning("chat_session_not_found_for_rag", session_id=session_id)
             raise ValueError("Chat session was not found")
 
         query_embedding = await self.gemini_client.generate_embeddings(content)
@@ -44,13 +51,38 @@ class RAGService:
             .limit(self.top_k)
         )
         retrieved = (await self.session.execute(statement)).all()
+        closest_distance = float(retrieved[0].distance) if retrieved else None
+        logger.info(
+            "rag_retrieval_completed",
+            session_id=session_id,
+            game_id=chat_session.game_id,
+            retrieved_count=len(retrieved),
+            closest_distance=closest_distance,
+        )
 
-        if not retrieved or float(retrieved[0].distance) > self.similarity_threshold:
+        if (
+            not retrieved
+            or closest_distance is None
+            or closest_distance > self.similarity_threshold
+        ):
+            logger.info(
+                "off_topic_query",
+                session_id=session_id,
+                game_id=chat_session.game_id,
+                closest_distance=closest_distance,
+                threshold=self.similarity_threshold,
+            )
             answer = OFF_TOPIC_MESSAGE
         else:
             history = await self._recent_messages(session_id)
             prompt = self.build_prompt(
                 content, [chunk.content for chunk, _ in retrieved], history
+            )
+            logger.info(
+                "rag_generation_started",
+                session_id=session_id,
+                retrieved_chunks=len(retrieved),
+                history_messages=len(history),
             )
             answer = await self.gemini_client.generate_response(prompt)
 
@@ -65,6 +97,9 @@ class RAGService:
             ChatMessage(session_id=session_id, role="assistant", content=answer)
         )
         await self.session.commit()
+        logger.info(
+            "chat_messages_saved", session_id=session_id, answer_length=len(answer)
+        )
 
     async def _recent_messages(self, session_id: int) -> list[ChatMessage]:
         statement = (

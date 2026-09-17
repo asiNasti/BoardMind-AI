@@ -5,6 +5,9 @@ from typing import Any, Self
 import httpx
 
 from backend.app.core.config import settings
+from backend.app.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class GeminiClientError(RuntimeError):
@@ -45,6 +48,7 @@ class GeminiClient:
             await self._http_client.aclose()
 
     async def generate_embeddings(self, text: str) -> list[float]:
+        logger.info("gemini_embedding_request", text_length=len(text))
         response = await self._post(
             "/models/text-embedding-004:embedContent",
             {"content": {"parts": [{"text": text}]}},
@@ -53,10 +57,13 @@ class GeminiClient:
         if not isinstance(embedding, list) or not all(
             isinstance(value, (int, float)) for value in embedding
         ):
+            logger.error("gemini_invalid_embedding_response")
             raise GeminiClientError("Gemini returned an invalid embedding response")
+        logger.info("gemini_embedding_success", vector_size=len(embedding))
         return [float(value) for value in embedding]
 
     async def generate_response(self, prompt: str) -> str:
+        logger.info("gemini_generation_request", prompt_length=len(prompt))
         response = await self._post(
             "/models/gemini-1.5-flash:generateContent",
             {"contents": [{"parts": [{"text": prompt}]}]},
@@ -64,18 +71,23 @@ class GeminiClient:
         try:
             text = response["candidates"][0]["content"]["parts"][0]["text"]
         except (KeyError, IndexError, TypeError) as exc:
+            logger.error("gemini_invalid_generation_response")
             raise GeminiClientError(
                 "Gemini returned an invalid generation response"
             ) from exc
         if not isinstance(text, str):
+            logger.error("gemini_invalid_generation_response")
             raise GeminiClientError("Gemini returned an invalid generation response")
+        logger.info("gemini_generation_success", response_length=len(text))
         return text
 
     async def _post(self, path: str, payload: Mapping[str, Any]) -> dict[str, Any]:
         if not self.api_key:
+            logger.error("gemini_api_key_missing")
             raise GeminiClientError("GEMINI_API_KEY is not configured")
 
         try:
+            logger.info("gemini_api_request", path=path)
             response = await self._http_client.post(
                 path,
                 params={"key": self.api_key},
@@ -84,8 +96,10 @@ class GeminiClient:
             response.raise_for_status()
             data = response.json()
         except (httpx.HTTPError, ValueError) as exc:
+            logger.warning("gemini_api_request_failed", path=path, error=str(exc))
             raise GeminiClientError("Gemini API request failed") from exc
 
         if not isinstance(data, dict):
+            logger.warning("gemini_invalid_response_format", path=path)
             raise GeminiClientError("Gemini returned an invalid response")
         return data

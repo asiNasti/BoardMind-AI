@@ -9,15 +9,21 @@ from backend.app.api.routers.documents import router as documents_router
 from backend.app.api.routers.games import router as games_router
 from backend.app.api.routers.health import router as health_router
 from backend.app.config import settings
+from backend.app.core.logger import get_logger, setup_logger
+
+logger = get_logger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    setup_logger()
+    logger.info("application_starting")
     app.state.http_client = httpx.AsyncClient(
         base_url=settings.gemini_api_base_url,
         timeout=settings.http_timeout,
     )
     yield
+    logger.info("application_shutdown")
     await app.state.http_client.aclose()
 
 
