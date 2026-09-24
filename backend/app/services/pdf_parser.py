@@ -1,16 +1,20 @@
 import io
 import re
+from typing import Any
 
+fitz: Any | None
 try:
     import fitz  # type: ignore
 except ImportError:  # pragma: no cover - optional dependency
     fitz = None
 
+PdfReader: Any | None
 try:
     from pypdf import PdfReader  # type: ignore
 except ImportError:  # pragma: no cover - optional dependency
     PdfReader = None
 
+pdfplumber: Any | None
 try:
     import pdfplumber  # type: ignore
 except ImportError:  # pragma: no cover - optional dependency
