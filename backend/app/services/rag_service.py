@@ -60,10 +60,13 @@ class RAGService:
             closest_distance=closest_distance,
         )
 
+        # pgvector cosine_distance is lower-is-better: a value at or above the
+        # configured threshold means the retrieved rule chunk is too far from the
+        # user's question to be considered relevant.
         if (
             not retrieved
             or closest_distance is None
-            or closest_distance > self.similarity_threshold
+            or closest_distance >= self.similarity_threshold
         ):
             logger.info(
                 "off_topic_query",

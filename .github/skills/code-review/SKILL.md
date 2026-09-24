@@ -33,11 +33,9 @@ This skill performs a rigorous code review of recently added or modified code. I
    - Ensure external AI calls (Google Gemini) use asynchronous HTTP clients (`httpx.AsyncClient`).
    - Verify that domain exceptions and API rate limits are caught and converted to clean FastAPI `HTTPException` responses without leaking stack traces.
 6. **Formatting & Type Safety Check:**
-   - Run the local quality tools to ensure no formatting or type issues were introduced:
+   - Run the project’s standard formatting and validation command to ensure no formatting or type issues were introduced:
      ```bash
-     black --check backend/
-     ruff check backend/
-     cd backend && mypy app
+     make fmt
      ```
    - Flag any formatting discrepancies or type errors as blocking issues.
 7. **Test Coverage Check:**
@@ -71,4 +69,4 @@ This skill performs a rigorous code review of recently added or modified code. I
 - No Live AI in Tests: Instantly flag any test file that hits the real Gemini API. respx mocking is mandatory.
 - Strict Verdicts: If there is even one "Blocking Issue", the Verdict MUST be CHANGE REQUESTED. Only issue a PASS if all architectural, RAG, and testing constraints are met.
 - Actionable Feedback: Always explain why something is wrong and provide a brief snippet showing the correct FastAPI/SQLAlchemy/httpx pattern.
-- Code Style & Types Compliance: Code must pass `black --check`, `ruff check`, and `mypy app`. Any linter or type-checking error found via bash must be marked as a blocking issue.
+- Code Style & Types Compliance: Code must pass `make fmt`. Any linter or type-checking error found via bash must be marked as a blocking issue.

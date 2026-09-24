@@ -349,7 +349,7 @@ Return messages sorted by `created_at` ascending.
 
 ### Increment 7 — RAG Query Flow & Guardrails
 
-- **Status:** pending
+- **Status:** completed
 - **Depends on:** Increment 5, Increment 6
 - **Estimated size:** L
 
@@ -384,9 +384,9 @@ Implement vector search, similarity threshold checking, prompt generation, and L
 - `POST /api/chat/sessions/{id}/messages/` -> returns AI answer.
 
 **Acceptance criteria**
-- [ ] Vector search returns top 3-5 closest chunks.
-- [ ] Requests below similarity threshold bypass LLM and return default message.
-- [ ] User and Assistant messages are saved to the database.
+- [x] Vector search returns top 3-5 closest chunks.
+- [x] Requests below similarity threshold bypass LLM and return default message.
+- [x] User and Assistant messages are saved to the database.
 
 **Notes for implementer**
 Use SQLAlchemy `cosine_distance` operator correctly.
