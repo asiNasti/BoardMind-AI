@@ -395,7 +395,7 @@ Use SQLAlchemy `cosine_distance` operator correctly.
 
 ### Increment 8 — Frontend Skeleton & Game Management
 
-- **Status:** pending
+- **Status:** completed
 - **Depends on:** Increment 4, Increment 5
 - **Estimated size:** M
 
@@ -430,9 +430,9 @@ Bootstrap the React frontend and build the UI for listing games and uploading PD
 - Running frontend application.
 
 **Acceptance criteria**
-- [ ] User can view a list of games.
-- [ ] User can create a new game and upload a `.pdf` file.
-- [ ] Loading spinner displays during ingestion process.
+- [x] User can view a list of games.
+- [x] User can create a new game and upload a `.pdf` file.
+- [x] Loading spinner displays during ingestion process.
 
 **Notes for implementer**
 Use standard FormData for PDF uploads.
