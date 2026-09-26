@@ -35,3 +35,23 @@ export function uploadDocument(gameId, file) {
     body: formData,
   });
 }
+
+export function createChatSession(gameId) {
+  return request('/api/chat/sessions/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ game_id: gameId }),
+  });
+}
+
+export function listChatMessages(sessionId) {
+  return request(`/api/chat/sessions/${sessionId}/messages/`);
+}
+
+export function sendChatMessage(sessionId, content) {
+  return request(`/api/chat/sessions/${sessionId}/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content }),
+  });
+}

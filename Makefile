@@ -2,6 +2,7 @@
 
 up:
 	docker compose up -d --build
+	cd frontend && npm run dev
 
 test:
 	cd backend && pytest --cov=app --cov-report=term-missing --cov-fail-under=80

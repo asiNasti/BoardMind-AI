@@ -23,7 +23,8 @@ button {
 }
 .app-shell {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background:
     radial-gradient(circle at 82% 8%, #e8e0d0 0, transparent 28%), #f3efe7;
 }
@@ -31,6 +32,10 @@ button {
   display: flex;
   flex: 0 0 285px;
   flex-direction: column;
+  height: 100vh;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 34px 24px 25px;
   background: #1f2923;
   color: #f4f0e7;
@@ -165,8 +170,13 @@ button {
   background: #a7c579;
 }
 .main-content {
+  display: flex;
   flex: 1;
+  height: 100vh;
   min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
   padding: 34px 6vw;
 }
 .topbar {
@@ -260,6 +270,156 @@ button {
   margin: 20px auto;
   color: #9a453c;
   font-size: 13px;
+}
+.chat-window {
+  display: flex;
+  flex: 1;
+  width: min(100%, 950px);
+  height: auto;
+  min-height: 0;
+  flex-direction: column;
+  margin: 7vh auto 0;
+  border-top: 1px solid #cfc7b8;
+  border-bottom: 1px solid #cfc7b8;
+}
+.chat-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 0 24px;
+  border-bottom: 1px solid #ddd6ca;
+}
+.chat-header h2 {
+  margin: 11px 0 0;
+  font-size: clamp(25px, 4vw, 40px);
+  letter-spacing: -0.04em;
+}
+.chat-status {
+  color: #7d8977;
+  font:
+    10px 'DM Mono',
+    monospace;
+  text-transform: uppercase;
+}
+.message-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 22px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 28px 4px;
+}
+.message {
+  width: min(78%, 620px);
+  padding: 16px 19px;
+  background: #e6dfd2;
+  color: #37352f;
+  line-height: 1.65;
+}
+.message.user {
+  align-self: flex-end;
+  background: #d1dfc9;
+}
+.message-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #76806f;
+  font:
+    10px 'DM Mono',
+    monospace;
+  text-transform: uppercase;
+}
+.message p {
+  margin: 0;
+}
+.chat-placeholder {
+  margin: auto;
+  color: #817d72;
+  font-size: 13px;
+  text-align: center;
+}
+.chat-placeholder strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #46443d;
+  font-size: 17px;
+}
+.chat-placeholder p {
+  margin: 0;
+}
+.chat-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 18px 0 25px;
+  border-top: 1px solid #ddd6ca;
+}
+.chat-composer textarea {
+  flex: 1;
+  min-height: 48px;
+  padding: 13px 14px;
+  border: 1px solid #cfc7b8;
+  border-radius: 2px;
+  outline: none;
+  background: #fffdf8;
+  color: #262521;
+  resize: vertical;
+  font-size: 13px;
+}
+.chat-composer textarea:focus {
+  border-color: #7f9a76;
+}
+.chat-composer button {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 2px;
+  background: #b8cba9;
+  color: #233025;
+  font-weight: 800;
+}
+.chat-composer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.chat-composer button span {
+  font-size: 17px;
+}
+.chat-error {
+  margin: 0 0 12px;
+  color: #9a453c;
+  font-size: 12px;
+}
+.markdown-view p {
+  margin: 0 0 10px;
+}
+.markdown-view p:last-child {
+  margin-bottom: 0;
+}
+.markdown-view h1,
+.markdown-view h2,
+.markdown-view h3 {
+  margin: 0 0 9px;
+  font-size: 18px;
+}
+.markdown-view ul {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+.markdown-view code {
+  padding: 2px 4px;
+  background: #d8d0c2;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.9em;
+}
+.markdown-view a {
+  color: #3c6842;
 }
 .modal-backdrop {
   position: fixed;
@@ -403,8 +563,12 @@ button {
 @media (max-width: 700px) {
   .app-shell {
     display: block;
+    height: auto;
+    overflow: visible;
   }
   .sidebar {
+    height: auto;
+    overflow: visible;
     min-height: auto;
     padding: 22px 18px 18px;
   }
@@ -424,6 +588,9 @@ button {
     display: none;
   }
   .main-content {
+    display: block;
+    height: auto;
+    overflow: visible;
     padding: 22px 18px;
   }
   .welcome-panel {
@@ -431,6 +598,26 @@ button {
     align-items: flex-start;
     margin-top: 50px;
     padding: 45px 0;
+  }
+  .chat-window {
+    height: auto;
+    min-height: calc(100vh - 270px);
+    margin-top: 35px;
+  }
+  .chat-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .message {
+    width: 90%;
+  }
+  .chat-composer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .chat-composer button {
+    justify-content: center;
   }
   .panel-illustration {
     display: none;

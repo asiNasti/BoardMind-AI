@@ -441,7 +441,7 @@ Use standard FormData for PDF uploads.
 
 ### Increment 9 — Frontend Chat Interface
 
-- **Status:** pending
+- **Status:** completed
 - **Depends on:** Increment 6, Increment 7, Increment 8
 - **Estimated size:** M
 
@@ -473,8 +473,8 @@ Build the conversational UI allowing users to ask questions about the selected g
 - Fully functional chat interface bound to selected game's session.
 
 **Acceptance criteria**
-- [ ] User can send a message and see it appear.
-- [ ] AI response is appended and rendered with Markdown.
+- [x] User can send a message and see it appear.
+- [x] AI response is appended and rendered with Markdown.
 
 **Notes for implementer**
 Ensure auto-scroll to bottom on new messages.
