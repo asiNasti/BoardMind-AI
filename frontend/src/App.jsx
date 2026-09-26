@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Sidebar } from './components/Sidebar';
+import { ChatWindow } from './components/ChatWindow';
 import { UploadModal } from './components/UploadModal';
 import { createGame, listGames, uploadDocument } from './services/api';
 import './styles.css';
@@ -60,32 +61,36 @@ function App() {
           </span>
           <span className="account-chip">Guest workspace</span>
         </header>
-        <section className="welcome-panel">
-          <div className="panel-copy">
-            <span className="eyebrow">Your rules desk</span>
-            <h2>
-              {selectedGame ? selectedGame.title : 'Make every rule clear.'}
-            </h2>
-            <p>
-              {selectedGame
-                ? 'Your rulebook is ready for questions. Chat support is coming next.'
-                : 'Upload a board game rulebook to build your searchable library.'}
-            </p>
-            {!selectedGame && (
-              <button
-                className="primary-button"
-                onClick={() => setIsModalOpen(true)}
-                type="button"
-              >
-                Add your first game <span aria-hidden="true">↗</span>
-              </button>
-            )}
-          </div>
-          <div className="panel-illustration" aria-hidden="true">
-            <span>RULES</span>
-            <strong>01</strong>
-          </div>
-        </section>
+        {selectedGame ? (
+          <ChatWindow game={selectedGame} />
+        ) : (
+          <section className="welcome-panel">
+            <div className="panel-copy">
+              <span className="eyebrow">Your rules desk</span>
+              <h2>
+                {selectedGame ? selectedGame.title : 'Make every rule clear.'}
+              </h2>
+              <p>
+                {selectedGame
+                  ? 'Your rulebook is ready for questions. Chat support is coming next.'
+                  : 'Upload a board game rulebook to build your searchable library.'}
+              </p>
+              {!selectedGame && (
+                <button
+                  className="primary-button"
+                  onClick={() => setIsModalOpen(true)}
+                  type="button"
+                >
+                  Add your first game <span aria-hidden="true">↗</span>
+                </button>
+              )}
+            </div>
+            <div className="panel-illustration" aria-hidden="true">
+              <span>RULES</span>
+              <strong>01</strong>
+            </div>
+          </section>
+        )}
         {error && !isModalOpen && (
           <p className="page-error" role="alert">
             {error}
